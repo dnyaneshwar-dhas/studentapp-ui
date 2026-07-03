@@ -1,16 +1,10 @@
 version: "3.8"
-
-services:
+services: 
 
   studentapp:
-
     build: .
-
-    image: studentapp:latest
-
-    container_name: student-app
-
+    image: studentapp
+    container_name: studentapp
     ports:
       - "8080:8080"
-
-    restart: always
+    
