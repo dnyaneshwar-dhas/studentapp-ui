@@ -31,6 +31,15 @@ pipeline {
             }
         }
 
+        stage('Artifacts upload to s3') {
+            steps {
+                sh '''
+                aws s3 cp target/studentapp-2.2-SNAPSHOT.war s3://amzon-mayur-s3-bucket-123/studentapp.war
+                '''
+                echo 'Artifacts uploaded to S3 successfully'
+            }
+        }
+
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonar') {
