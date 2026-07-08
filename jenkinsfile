@@ -3,12 +3,12 @@ pipeline {
         label 'worker'
     }
 
-    environment {
-        my_aws_credentials = credentials('aws-access')
-    }
-
     tools {
         maven 'maven1'
+    }
+
+    environment {
+        my_aws_credentials = credentials('aws-access')
     }
 
     stages {
@@ -22,22 +22,12 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'mvn clean package'
-                echo 'build is successful'
+                echo 'Build is successful'
             }
-
             post {
                 success {
-                    archiveArtifacts 'target/*.war'
-                    sh 'ls -la'
+                    archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
                 }
-            }
-        }
-
-        stage('Artifacts upload to S3') {
-            steps {
-                sh '''
-                aws s3 cp target/studentapp-2.2-SNAPSHOT.war s3://mayur-jenkins-bucket/
-                '''
             }
         }
 
@@ -48,7 +38,6 @@ pipeline {
                 }
             }
         }
-
 
         stage('Quality Gate') {
             steps {
@@ -69,50 +58,24 @@ pipeline {
             }
         }
 
-        stage('SonarQube Report') {
-            steps {
-                sh 'ls -la'
-                echo 'SonarQube analysis completed'
-            }
-        }
-
-        stage('Docker Build') {
+        stage('Build With Docker') {
             steps {
                 sh 'docker build -t studentapp .'
-                echo 'Docker image build is successful'
+                echo 'Docker build is successful'
             }
         }
 
-        stage('Docker push to ECR') {
+        stage('Push TO ECR') {
             steps {
                 sh '''
                 aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 506995420953.dkr.ecr.us-east-2.amazonaws.com
                 docker tag studentapp:latest 506995420953.dkr.ecr.us-east-2.amazonaws.com/studentapp:latest
                 docker push 506995420953.dkr.ecr.us-east-2.amazonaws.com/studentapp:latest
                 '''
+                echo 'Docker image pushed to ECR successfully'
             }
-        }
-
-        stage('Deploy to EKS') {
-            steps {
-                sh '''
-                aws eks update-kubeconfig --name my-cluster-student --region us-east-2
-                kubectl apply -f student-deploy-svc.yaml
-                kubectl get pods
-                sleep 30 
-                kubectl get svc -o wide
-                '''
-            }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline succeeded'
-        }
-        failure {
-            echo 'Pipeline failed'
         }
     }
 }
+
 
