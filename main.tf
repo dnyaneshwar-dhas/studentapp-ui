@@ -20,7 +20,7 @@ data "aws_vpc" "default" { // Fetch default VPC
 
 variable "cluster_name" { // Variable for cluster name
   type    = string
-  default = "my-cluster-student"
+  default = "my-cluster"
 }
 
 data "aws_subnets" "default" { // Fetch  all subnets in the default VPC
