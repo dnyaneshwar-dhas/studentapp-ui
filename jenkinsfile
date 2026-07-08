@@ -5,7 +5,7 @@ pipeline {
 
     tools {
         maven 'maven1'
-        dependency-check 'dc'
+        dependencyCheck 'dc'
     }
 
     environment {
