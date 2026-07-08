@@ -75,7 +75,30 @@ pipeline {
                 echo 'Docker image pushed to ECR successfully'
             }
         }
+
+        stage('Deploy to EKS') {
+            steps {
+                sh '''
+                aws eks update-kubeconfig --name my-cluster --region us-east-2
+                kubectl apply -f student-deploy-svc.yaml
+                sleep 30
+                kubectl get pods
+                sleep 30
+                kubectl get pods -o wide
+                kubectl get svc -o wide
+                '''
+                echo 'Deployment to EKS successful'
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo 'Pipeline is successful.'
+        }
+        failure {
+            echo 'Pipeline is failed.'
+        }
     }
 }
-
 
