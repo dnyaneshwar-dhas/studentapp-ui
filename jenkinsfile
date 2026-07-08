@@ -5,6 +5,7 @@ pipeline {
 
     tools {
         maven 'maven1'
+        owasp 'dc'
     }
 
     environment {
@@ -12,10 +13,11 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 git 'https://github.com/mayurpandit25/studentapp-ui.git'
-                echo 'clonning is successful'
+                echo 'Cloning is successful'
             }
         }
 
@@ -31,7 +33,7 @@ pipeline {
             }
         }
 
-        stage('Artifacts upload to s3') {
+        stage('Artifacts upload to S3') {
             steps {
                 sh '''
                 aws s3 cp target/studentapp-2.2-SNAPSHOT.war s3://amzon-mayur-s3-bucket-123/studentapp.war
@@ -55,9 +57,11 @@ pipeline {
                         try {
                             def qg = waitForQualityGate()
                             echo "Quality Gate Status: ${qg.status}"
+
                             if (qg.status != 'OK') {
                                 error "Quality Gate failed: ${qg.status}"
                             }
+
                         } catch (Exception e) {
                             echo "Quality Gate check failed: ${e.message}"
                             error "Quality Gate stage failed"
@@ -67,10 +71,29 @@ pipeline {
             }
         }
 
+        stage('OWASP Dependency Check') {
+            steps {
+                dependencyCheck(
+                    odcInstallation: 'dc',
+                    additionalArguments: '--scan . --format XML --format HTML'
+                )
+                dependencyCheckPublisher(
+                    pattern: '**/dependency-check-report.xml'
+                )
+            }
+        }
+
         stage('Build With Docker') {
             steps {
                 sh 'docker build -t studentapp .'
                 echo 'Docker build is successful'
+            }
+        }
+
+        stage('Trivy Image Scan') {
+            steps {
+                sh 'trivy image --severity HIGH,CRITICAL --exit-code 1 studentapp:latest'
+                echo 'Trivy image scan completed successfully'
             }
         }
 
@@ -92,7 +115,7 @@ pipeline {
                 kubectl apply -f student-deploy-svc.yaml
                 sleep 30
                 kubectl get pods
-                sleep 30
+                sleep 10
                 kubectl get pods -o wide
                 kubectl get svc -o wide
                 '''
@@ -100,7 +123,7 @@ pipeline {
             }
         }
     }
-    
+
     post {
         success {
             echo 'Pipeline is successful.'
