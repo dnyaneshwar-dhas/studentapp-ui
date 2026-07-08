@@ -56,7 +56,6 @@ pipeline {
                         try {
                             def qg = waitForQualityGate()
                             echo "Quality Gate Status: ${qg.status}"
-
                             if (qg.status != 'OK') {
                                 error "Quality Gate failed: ${qg.status}"
                             }
