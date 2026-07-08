@@ -9,6 +9,7 @@ pipeline {
 
     environment {
         my_aws_credentials = credentials('aws-access')
+        NVD_API_KEY = credentials('nvd-api-key')
     }
 
     stages {
@@ -73,7 +74,7 @@ pipeline {
             steps {
                 dependencyCheck(
                     odcInstallation: 'dc',
-                    additionalArguments: '--scan . --format XML --format HTML'
+                    additionalArguments: "--scan . --nvdApiKey ${NVD_API_KEY} --format XML --format HTML"
                 )
                 dependencyCheckPublisher(
                     pattern: '**/dependency-check-report.xml'
