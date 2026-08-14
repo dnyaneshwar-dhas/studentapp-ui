@@ -7,10 +7,9 @@ pipeline {
         stage('checkout') {
             steps {
                 sh '''
-                echo "cloning is sucessfull
+                    echo "cloning is successful"
                 '''
             }
-
         }
     }
 }
