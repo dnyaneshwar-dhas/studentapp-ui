@@ -6,9 +6,7 @@ pipeline {
     stages {
         stage('checkout') {
             steps {
-                sh '''
-                echo "clonning is successful"
-                '''
+                git branch: 'master', url: 'https://github.com/mayurpandit25/studentapp-ui.git'
             }
         }
     }
