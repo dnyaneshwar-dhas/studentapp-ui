@@ -8,6 +8,7 @@ RUN tar -xzf /opt/apache-tomcat-9.0.120.tar.gz -C /opt/ && \
     rm -rf /opt/apache-tomcat-9.0.120.tar.gz && \
     cp -rf /opt/target/*.war /opt/apache-tomcat-9.0.120/webapps/student.war && \
     cp -rf /opt/mysql-connector.jar /opt/apache-tomcat-9.0.120/lib/mysql-connector.jar && \
-    cp /opt/context.xml /opt/apache-tomcat-9.0.120/conf/context.xml
+    cp /opt/context.xml /opt/apache-tomcat-9.0.120/conf/context.xml && \
+    chmod +x /opt/apache-tomcat-9.0.120/bin/catalina.sh
 EXPOSE 8080
 CMD ["/opt/apache-tomcat-9.0.120/bin/catalina.sh","run"]
