@@ -71,5 +71,18 @@ pipeline {
                 '''
             }
         }
+
+        stage('Deploy to EKS') {
+            steps {
+                sh '''
+                aws eks update-kubeconfig --region us-east-2 --name my-cluster-mayur
+                kubectl apply -f k8s/
+                kubectl get pods 
+                sleep 30
+                kubectl get pods
+                kubectl get svc -o wide
+                '''
+            }
+        }
     }
 }
