@@ -9,5 +9,11 @@ pipeline {
                 git branch: 'master', url: 'https://github.com/mayurpandit25/studentapp-ui.git'
             }
         }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
     }
 }
