@@ -3,132 +3,13 @@ pipeline {
         label 'worker'
     }
 
-    tools {
-        maven 'maven1'
-    }
-
-    environment {
-        my_aws_credentials = credentials('aws-access')
-        NVD_API_KEY = credentials('nvd-api-key')
-    }
-
     stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/mayurpandit25/studentapp-ui.git'
-                echo 'Cloning is successful'
-            }
-        }
-
-        stage('Build') {
-            steps {
-                sh 'mvn clean package'
-                echo 'Build is successful'
-            }
-            post {
-                success {
-                    archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
-                }
-            }
-        }
-
-        stage('Artifacts upload to S3') {
+        stage('checkout') {
             steps {
                 sh '''
-                aws s3 cp target/studentapp-2.2-SNAPSHOT.war s3://amzon-mayur-s3-bucket-123/studentapp.war
+                echo "clonning is successful"
                 '''
-                echo 'Artifacts uploaded to S3 successfully'
             }
-        }
-
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('sonar') {
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
-
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    script {
-                        try {
-                            def qg = waitForQualityGate()
-                            echo "Quality Gate Status: ${qg.status}"
-                            if (qg.status != 'OK') {
-                                error "Quality Gate failed: ${qg.status}"
-                            }
-
-                        } catch (Exception e) {
-                            echo "Quality Gate check failed: ${e.message}"
-                            error "Quality Gate stage failed"
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('OWASP Dependency Check') {
-            steps {
-                dependencyCheck(
-                    odcInstallation: 'dc',
-                    additionalArguments: "--scan . --nvdApiKey ${NVD_API_KEY} --format XML --format HTML"
-                )
-                dependencyCheckPublisher(
-                    pattern: '**/dependency-check-report.xml'
-                )
-            }
-        }
-
-        stage('Build With Docker') {
-            steps {
-                sh 'docker build -t studentapp .'
-                echo 'Docker build is successful'
-            }
-        }
-
-        stage('Trivy Image Scan') {
-            steps {
-                sh 'trivy image --severity HIGH,CRITICAL --exit-code 1 studentapp:latest'
-                echo 'Trivy image scan completed successfully'
-            }
-        }
-
-        stage('Push TO ECR') {
-            steps {
-                sh '''
-                aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 506995420953.dkr.ecr.us-east-2.amazonaws.com
-                docker tag studentapp:latest 506995420953.dkr.ecr.us-east-2.amazonaws.com/studentapp:latest
-                docker push 506995420953.dkr.ecr.us-east-2.amazonaws.com/studentapp:latest
-                '''
-                echo 'Docker image pushed to ECR successfully'
-            }
-        }
-
-        stage('Deploy to EKS') {
-            steps {
-                sh '''
-                aws eks update-kubeconfig --name my-cluster --region us-east-2
-                kubectl apply -f student-deploy-svc.yaml
-                sleep 30
-                kubectl get pods
-                sleep 10
-                kubectl get pods -o wide
-                kubectl get svc -o wide
-                '''
-                echo 'Deployment to EKS successful'
-            }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline is successful.'
-        }
-        failure {
-            echo 'Pipeline is failed.'
         }
     }
 }
-
