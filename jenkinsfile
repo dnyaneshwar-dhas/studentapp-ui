@@ -76,6 +76,7 @@ pipeline {
             steps {
                 sh '''
                 aws eks update-kubeconfig --region us-east-2 --name my-cluster-mayur
+                sudo snap install kubectl --classic
                 kubectl apply -f k8s/
                 kubectl get pods 
                 sleep 30
