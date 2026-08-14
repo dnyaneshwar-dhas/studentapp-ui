@@ -3,6 +3,14 @@ pipeline {
         label 'worker'
     }
 
+    tools {
+        terraform 'tf'
+    }
+
+    environment {
+        my_aws_cred = credentials('aws-cred')
+    }
+
     stages {
         stage('checkout') {
             steps {
