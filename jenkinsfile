@@ -79,7 +79,7 @@ pipeline {
                 sudo snap install kubectl --classic
                 kubectl apply -f k8s/
                 kubectl get pods 
-                sleep 30
+                sleep 10
                 kubectl get pods
                 kubectl get svc -o wide
                 '''
