@@ -56,7 +56,7 @@ pipeline {
         stage('Docker Build') {
             steps {
                 sh '''
-                docker build --no-cache-t studentapp:latest .
+                docker build --no-cache -t studentapp:latest .
                 docker images
                 '''
             }
