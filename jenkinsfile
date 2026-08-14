@@ -3,12 +3,20 @@ pipeline {
         label 'worker'
     }
 
+    tools {
+        maven 'maven'
+    }
+
     stages {
-        stage('checkout') {
+        stage('Checkout') {
             steps {
-                sh '''
-                    echo "cloning is successful"
-                '''
+                git 'https://github.com/dnyaneshwar-dhas/studentapp-ui.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
             }
         }
     }
