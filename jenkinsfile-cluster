@@ -1,0 +1,37 @@
+pipeline {
+    agent {
+        label 'worker'
+    }
+
+    stages {
+        stage('checkout') {
+            steps {
+                git 'https://github.com/mayurpandit25/studentapp-ui.git'
+            }
+        }
+
+        stage('Terraform - INIT') {
+            steps {
+                sh 'terraform init'
+            }
+        }
+
+        stage('Terraform - VALIDATE') {
+            steps {
+                sh 'terraform validate'
+            }
+        }
+
+        stage('Terraform - PLAN') {
+            steps {
+                sh 'terraform plan'
+            }
+        }
+
+        stage('Terraform - APPLY') {
+            steps {
+                sh 'terraform apply -auto-approve'
+            }
+        }
+    }
+}
