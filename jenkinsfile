@@ -24,5 +24,12 @@ pipeline {
                 }
             }
         }
+        stage('Artifacts to s3') {
+            steps {
+                sh '''
+                aws s3 cp target/*.war s3://omkar.space/Artifacts/student.war
+                '''
+            }
+        }
     }
 }
