@@ -50,6 +50,15 @@ pipeline {
                 }
             }
         }
+
+        stage(Docker Build) {
+            steps {
+                sh '''
+                docker build --no-cache -t studentapp:v1 .
+                docker images
+                '''
+            }
+        }
         
     }
 }

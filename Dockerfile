@@ -10,3 +10,6 @@ COPY context.xml /opt/apache-tomcat-9.0.120/conf/context.xml
 RUN chmod +x /opt/apache-tomcat-9.0.120/bin/catalina.sh
 EXPOSE 8080
 CMD ["/opt/apache-tomcat-9.0.120/bin/catalina.sh","run"]
+
+
+
