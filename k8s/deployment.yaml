@@ -1,38 +1,43 @@
-apiVersion: apps/v1 
-kind: Deployment 
-metadata: 
-  name: student-deployment 
-  labels: 
-    app: student 
-spec: 
-  replicas: 3 
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: student-deployment
+  labels:
+    app: student
+
+spec:
+  replicas: 3
+
   strategy:
-    type: RollingUpdate 
+    type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 0
+
   selector:
     matchLabels:
-      app: student 
-  template: 
-    metadata: 
+      app: student
+
+  template:
+    metadata:
       name: student-template
-      labels: 
-        app: student 
-    spec: 
+      labels:
+        app: student
+
+    spec:
       containers:
         - name: student-container
           image: 942049393829.dkr.ecr.us-east-2.amazonaws.com/studentapp:latest
+
           ports:
             - name: student-port
               containerPort: 8080
-      resources:
-        requests:
-          cpu: "100m"
-          memory: "128Mi"
-        limits:
-          cpu: "200m"
-          memory: "256Mi"
 
-
-          
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
