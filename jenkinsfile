@@ -28,10 +28,11 @@ pipeline {
                 }
             }
         }
+
         stage('Artifacts to s3') {
             steps {
                 sh '''
-                aws s3 cp target/*.war s3://omkar.space/Artifacts/student.war
+                    aws s3 cp target/*.war s3://omkar.space/Artifacts/student.war
                 '''
             }
         }
@@ -43,6 +44,7 @@ pipeline {
                 }
             }
         }
+
         stage('Quality Gate') {
             steps {
                 timeout(time: 4, unit: 'MINUTES') {
@@ -54,31 +56,20 @@ pipeline {
         stage('Docker Build') {
             steps {
                 sh '''
-                docker build -t studentapp:latest .
-                docker images
+                    docker build -t studentapp:latest .
+                    docker images
                 '''
-            }
-        }
-        stage('push image to ECR') {
-            steps {
-                sh '''
-                aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 872582135546.dkr.ecr.us-east-2.amazonaws.com
-                docker tag studentapp:latest 872582135546.dkr.ecr.us-east-2.amazonaws.com/studentapp:latest
-                docker push 872582135546.dkr.ecr.us-east-2.amazonaws.com/studentapp:latest
-                '''
-                
             }
         }
 
         stage('push image to ECR') {
             steps {
                 sh '''
-                aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 872582135546.dkr.ecr.us-east-2.amazonaws.com
-                docker tag studentapp:latest 872582135546.dkr.ecr.us-east-2.amazonaws.com/studentapp:latest
-                docker push 872582135546.dkr.ecr.us-east-2.amazonaws.com/studentapp:latest
+                    aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 872582135546.dkr.ecr.us-east-2.amazonaws.com
+                    docker tag studentapp:latest 872582135546.dkr.ecr.us-east-2.amazonaws.com/studentapp:latest
+                    docker push 872582135546.dkr.ecr.us-east-2.amazonaws.com/studentapp:latest
                 '''
             }
         }
-        
     }
 }
